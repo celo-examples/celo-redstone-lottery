@@ -5,20 +5,28 @@ import "redstone-evm-connector/lib/contracts/message-based/PriceAwareOwnable.sol
 
 contract Lottery is PriceAwareOwnable {
 
-    uint256 private _totalLotteries;
+    uint256 private totalLotteries;
 
     struct LotteryStruct {
         uint256 id;
         string title;
         uint256 ticketPrice;
-        address[] participants;
+        uint256[] luckyNumbers;
+        uint256 participantCount;
         bool ended;
         address owner;
         uint256 createdAt;
         uint256 expiresAt;
     }
 
+    struct ParticipantStruct {
+        address payable account;
+        uint256 luckyNumber;
+        bool paid;
+    }
+
     mapping(uint256 => LotteryStruct) lotteries;
+    mapping(uint256 => ParticipantStruct) lotteryParticipants;
 
     event Random(uint256 rand);
 
@@ -33,7 +41,7 @@ contract Lottery is PriceAwareOwnable {
 
         LotteryStruct memory lottery;
 
-        lottery.id = _totalLotteries;
+        lottery.id = totalLotteries;
         lottery.title = title;
         lottery.ticketPrice = ticketPrice;
         lottery.owner = msg.sender;
@@ -42,7 +50,7 @@ contract Lottery is PriceAwareOwnable {
 
         lotteries[lottery.id] = lottery;
 
-        _totalLotteries ++;
+        totalLotteries ++;
         }
 
     function enter(uint256 _id) public payable {
@@ -53,23 +61,34 @@ contract Lottery is PriceAwareOwnable {
         require(block.timestamp * 1000 >= lottery.expiresAt, "End time reached");
         require(msg.value >= lottery.ticketPrice, "insufficient payment" );
 
-        lottery.participants.push(msg.sender);
+        uint256 _luckyNumber = random();
+
+        lotteryParticipants[_id] = ParticipantStruct({
+            account: payable(msg.sender),
+            luckyNumber: _luckyNumber,
+            paid: false
+        });
+
+        lottery.luckyNumbers.push(_luckyNumber);
     }
 
     function pickWinner(uint256 _id) public {
         LotteryStruct storage lottery = lotteries[_id];
-        uint256 totalLotteryAmount = lottery.ticketPrice * lottery.participants.length;
-        uint256 index = random() % lottery.participants.length;
-        payable(lottery.participants[index]).transfer(totalLotteryAmount);
+        ParticipantStruct storage lotteryParticipant = lotteryParticipants[_id];
+        uint256 totalLotteryAmount = lottery.ticketPrice * lottery.participantCount;
+
+   //Shuffle randoom number and select one
+
+        lotteryParticipant.account.transfer(totalLotteryAmount);
         lottery.ended = true;
-        emit Random(index);
+        //emit Random(index);
     }
 
     function getLottery(uint256 _id) public view returns (
         uint256 id,
         string memory title,
         uint256 ticketPrice,
-        address[] memory participants,
+        //ParticipantStruct[] calldata participants,
         bool ended,
         address owner,
         uint256 createdAt,
@@ -81,7 +100,7 @@ contract Lottery is PriceAwareOwnable {
             _lottery.id,
             _lottery.title,
             _lottery.ticketPrice,
-            _lottery.participants,
+           // _lottery.participantCount,
             _lottery.ended,
             _lottery.owner,
             _lottery.createdAt,
@@ -104,11 +123,10 @@ contract Lottery is PriceAwareOwnable {
               )
             );
 
-        //return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, lotteries[_id].participants.length)));
     }
 
     function getLotteryCount() public view returns (uint256) {
-     return _totalLotteries;
+     return totalLotteries;
     }
  function test() public view returns (uint256) {
 

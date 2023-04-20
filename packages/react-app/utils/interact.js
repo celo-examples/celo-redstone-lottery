@@ -3,7 +3,7 @@ import { WrapperBuilder } from 'redstone-evm-connector'
 import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
 import { priceToWei } from './helpers'
 
-export const contractAddress = '0xC354837E96DDF46Df37E7917B12572A87a64319F'
+export const contractAddress = '0xBb915A2421E353A4c2c653B94FfcD2E85a32A09f'
 
 export async function getContract() {
 
