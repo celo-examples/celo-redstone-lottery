@@ -1,8 +1,9 @@
-import { providers, Contract, ethers } from 'ethers'
+import { providers, Contract, ethers, BigNumber } from 'ethers'
+import { WrapperBuilder } from 'redstone-evm-connector'
 import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
 import { priceToWei } from './helpers'
 
-export const contractAddress = '0xa06842df8491FF112a42aF6DEBE8FE50f7866381'
+export const contractAddress = '0xC354837E96DDF46Df37E7917B12572A87a64319F'
 
 export async function getContract() {
 
@@ -67,11 +68,28 @@ export const enter = async (index, value) => {
 export const endLottery = async index => {
   try {
     const contract = await getContract()
-    let res = await contract.pickWinner(index)
-    res = await res.wait()
+
+
+    const wrappedContract = WrapperBuilder
+      .wrapLite(contract)
+      .usingPriceFeed('redstone', { asset: 'ENTROPY' })
+
+    // Provider should be authorized once after contract deployment
+    // You should be the owner of the contract to authorize provider
+    await wrappedContract.authorizeProvider();
+
+
+    let res = await wrappedContract.test()
+    // let res = await wrappedContract.pickWinner(index)
+    // res = await res.wait()
+    const bigNumber = BigNumber.from(res);
+    const decimalValue = bigNumber.toString(10);
+
+    console.log('rrrr ', decimalValue)
     return res
 
   } catch (e) {
+    console.log('kkl')
     console.log(e)
   }
 }

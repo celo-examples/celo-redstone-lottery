@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-contract Lottery {
+import "redstone-evm-connector/lib/contracts/message-based/PriceAwareOwnable.sol";
+
+contract Lottery is PriceAwareOwnable {
 
     uint256 private _totalLotteries;
 
@@ -18,14 +20,16 @@ contract Lottery {
 
     mapping(uint256 => LotteryStruct) lotteries;
 
+    event Random(uint256 rand);
+
     //constructor(uint _ticketPrice) {
 
     //}
 
      function createLottery(string memory title, uint256 ticketPrice, uint256 expiresAt) public {
-        require(bytes(title).length > 0, "title cannot be empty");
-        require(ticketPrice > 0 ether, "ticketPrice cannot be zero");
-        require( expiresAt > block.timestamp, "expireAt cannot be less than the future" );
+        require(bytes(title).length > 0, "Title can't be empty");
+        require(ticketPrice > 0 ether, "TicketPrice cannot be zero");
+        require( expiresAt > block.timestamp, "Expiration date cannot be less than the future" );
 
         LotteryStruct memory lottery;
 
@@ -55,9 +59,10 @@ contract Lottery {
     function pickWinner(uint256 _id) public {
         LotteryStruct storage lottery = lotteries[_id];
         uint256 totalLotteryAmount = lottery.ticketPrice * lottery.participants.length;
-        //uint index = random(_id) % lottery.participants.length;
-        payable(lottery.participants[0]).transfer(totalLotteryAmount);
+        uint256 index = random() % lottery.participants.length;
+        payable(lottery.participants[index]).transfer(totalLotteryAmount);
         lottery.ended = true;
+        emit Random(index);
     }
 
     function getLottery(uint256 _id) public view returns (
@@ -84,15 +89,41 @@ contract Lottery {
         );
     }
 
-    function random(uint256 _id) private view returns (uint) {
-        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, lotteries[_id].participants.length)));
+    function random() private view returns (uint256) {
+
+        uint256 randomValue = getPriceFromMsg(bytes32("ENTROPY"));
+
+            return uint256(
+              keccak256(
+                abi.encodePacked(
+                  randomValue,
+                  block.timestamp,
+                  blockhash(block.number - 1),
+                  blockhash(block.number)
+                )
+              )
+            );
+
+        //return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, lotteries[_id].participants.length)));
     }
 
     function getLotteryCount() public view returns (uint256) {
      return _totalLotteries;
     }
- function getDate(uint256 _index) public view returns (uint256) {
-     return lotteries[_index].expiresAt;
+ function test() public view returns (uint256) {
+
+    uint256 randomValue = getPriceFromMsg(bytes32("ENTROPY"));
+
+        return uint256(
+          keccak256(
+            abi.encodePacked(
+              randomValue,
+              block.timestamp / 1000,
+              blockhash(block.number - 1),
+              blockhash(block.number)
+            )
+          )
+        );
     }
 
 }

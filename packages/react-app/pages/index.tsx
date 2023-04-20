@@ -40,7 +40,7 @@ export default function Home(props: HomeProps) : JSX.Element{
 
   return (
     <div className="item-list">
-
+      <button type={'button'} onClick={() => endLotteryHandler(0)}>Endlot</button>
       <LotteryForm updateList={getLotteryHandler}/>
 
         <div className="grid grid-cols-3 gap-4 mt-10">
@@ -59,19 +59,6 @@ export default function Home(props: HomeProps) : JSX.Element{
             />
           ))}
       </div>
-
-      {showForm && <div className="flex mt-3">
-        <div className="">
-          <label htmlFor="value" className="sr-only">End Time</label>
-          <input onChange={e => setSelectedItemValue(e.target.value)} name="value" type="number" placeholder="Value"
-                 className="w-20 px-1 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-        </div>
-        <button onClick={sendBid} type="button"
-                className="ml-2 inline-flex items-center px-4 bg-blue-500 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-          {loading ? 'Sending ...' : 'Send'}
-        </button>
-      </div>}
-
     </div>
   )
 }
