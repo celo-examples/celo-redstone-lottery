@@ -52,6 +52,9 @@ const LotteryCard: React.FC<LotteryCardProps> = ({
           {!ended && lotteryElapsed(endTime) && <button onClick={() => endLotteryHandler(id)} className="mt-3 bg-slate-300 w-28 rounded">
             End Lottery
           </button>}
+          {ended && <button disabled className="mt-3 bg-slate-200 w-28 rounded">
+            Lottery Ended
+          </button>}
         </div>
       </div>
   );

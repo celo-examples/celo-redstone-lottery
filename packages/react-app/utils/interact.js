@@ -65,22 +65,11 @@ export const enter = async (index, value) => {
 }
 
 export const endLottery = async index => {
-// alert(index)
   try {
     const contract = await getContract()
-    let res = await contract.pickWinner(1)
+    let res = await contract.pickWinner(index)
     res = await res.wait()
     return res
-
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-export const expire = async (index) => {
-  try {
-    const contract = await getContract()
-    return await contract.getDate(index)
 
   } catch (e) {
     console.log(e)

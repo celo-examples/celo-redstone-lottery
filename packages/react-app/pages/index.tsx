@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getLotteries, enter, endLottery, expire } from '../utils'
+import { getLotteries, enter, endLottery } from '../utils'
 import LotteryCard from '../components/LotteryCard'
 import LotteryForm from '../components/LotteryForm'
 
@@ -21,7 +21,6 @@ export default function Home(props: HomeProps) : JSX.Element{
   const getLotteryHandler = async () => {
     const res = await getLotteries()
     setLotteries(res)
-    console.log((await expire(0)).toNumber())
   }
 
   const enterLotteryHandler = (id, price) => {
@@ -37,7 +36,7 @@ export default function Home(props: HomeProps) : JSX.Element{
 
     getLotteryHandler()
 
-  }, [getLotteries, expire])
+  }, [getLotteries])
 
   return (
     <div className="item-list">
