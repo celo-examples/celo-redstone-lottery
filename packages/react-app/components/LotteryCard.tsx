@@ -1,15 +1,17 @@
-import { timestampToDate } from '../utils'
+import { timestampToDate, lotteryElapsed } from '../utils'
 import {ethers} from "ethers";
 import { useAccount } from 'wagmi'
 
 interface LotteryCardProps {
-  // id: number;
-  // owner: string;
+  id: number;
+  owner: string;
   title: string;
   price: number;
-  // endTime: number;
-  // ended: boolean;
+  participants: number;
+  endTime: number;
+  ended: boolean;
   enterLotteryHandler: (id: number, price: number) => void;
+  endLotteryHandler: (id: number) => void;
 }
 
 
@@ -19,9 +21,11 @@ const LotteryCard: React.FC<LotteryCardProps> = ({
      owner,
      title,
      price,
+     participants,
      endTime,
      ended,
-     enterLotteryHandler
+     enterLotteryHandler,
+     endLotteryHandler
    }) => {
 
   const { address } = useAccount()
@@ -29,25 +33,26 @@ const LotteryCard: React.FC<LotteryCardProps> = ({
 
   return (
       <div className="bg-white rounded-lg shadow-lg p-4">
-        <h2 className="mb-2">{title}</h2>
-        {/*<div className="flex justify-between">*/}
-        {/*  <div className="mr-4">*/}
-        {/*    <p>Current Bid</p>*/}
-        {/*    <span>{ethers.utils.formatEther(highestBid)}</span>*/}
-        {/*  </div>*/}
-        {/*  <div>*/}
-        {/*    <p>Auction End</p>*/}
-        {/*    <span>{timestampToDate(endTime.toNumber())}</span>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
-        {/*<div>*/}
-          {!ended && (owner !== address) && <button onClick={() => enterLotteryHandler(id, price)} className="mt-3 bg-slate-300 w-28 rounded">
-            Bid
+        <h2 className="mb-4 font-bold">{title} <br/>
+        <span className="font-light">{ethers.utils.formatEther(price)} CELO</span></h2>
+        <div className="flex justify-between">
+          <div className="mr-4">
+            <p>Participants</p>
+            <span>{participants}</span>
+          </div>
+          <div>
+            <p>End Date</p>
+            <span>{timestampToDate(endTime.toNumber())}</span>
+          </div>
+        </div>
+        <div>
+          {!ended && !lotteryElapsed(endTime) && (owner !== address) && <button onClick={() => enterLotteryHandler(id, price)} className="mt-3 bg-slate-300 w-28 rounded">
+            Buy
           </button>}
-        {/*  {!ended && (owner === address) && <button onClick={() => endAuctionHandler(id)} className="mt-3 bg-slate-300 w-28 rounded">*/}
-        {/*    End Auction*/}
-        {/*  </button>}*/}
-        {/*</div>*/}
+          {!ended && lotteryElapsed(endTime) && <button onClick={() => endLotteryHandler(id)} className="mt-3 bg-slate-300 w-28 rounded">
+            End Lottery
+          </button>}
+        </div>
       </div>
   );
 };

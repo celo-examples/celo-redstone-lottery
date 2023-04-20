@@ -2,7 +2,7 @@ import { providers, Contract, ethers } from 'ethers'
 import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
 import { priceToWei } from './helpers'
 
-export const contractAddress = '0x97b445cA5353B0Ab2B06081c8c57aa3c26213fB8'
+export const contractAddress = '0xa06842df8491FF112a42aF6DEBE8FE50f7866381'
 
 export async function getContract() {
 
@@ -22,7 +22,7 @@ export async function getContract() {
 }
 
 export const createLottery = async (title, ticketPrice, endTime) => {
-
+ console.log(priceToWei(ticketPrice))
   try {
     const contract = await getContract()
       const res = await contract.createLottery(title, priceToWei(ticketPrice), endTime)
@@ -55,7 +55,7 @@ export const enter = async (index, value) => {
 
   try {
     const contract = await getContract()
-    let res = await contract.enter(index, {value: priceToWei(value)})
+    let res = await contract.enter(index, {value})
     res = await res.wait()
     return res
 
@@ -65,10 +65,10 @@ export const enter = async (index, value) => {
 }
 
 export const endLottery = async index => {
-
+// alert(index)
   try {
     const contract = await getContract()
-    let res = await contract.endLottery(index)
+    let res = await contract.pickWinner(1)
     res = await res.wait()
     return res
 
@@ -77,12 +77,10 @@ export const endLottery = async index => {
   }
 }
 
-export const startLottery = async (index, value) => {
+export const expire = async (index) => {
   try {
     const contract = await getContract()
-    let res = await contract.bid(index, {value: ethers.utils.parseEther(value)})
-    res = await res.wait()
-    return res
+    return await contract.getDate(index)
 
   } catch (e) {
     console.log(e)

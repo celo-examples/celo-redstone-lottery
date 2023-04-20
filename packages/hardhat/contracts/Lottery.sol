@@ -46,8 +46,7 @@ contract Lottery {
         LotteryStruct storage lottery = lotteries[_id];
 
         require(msg.sender != lottery.owner, "Owner can't participate" );
-        require(block.timestamp >= lottery.expiresAt, "End time reached");
-        require(msg.value >= lottery.ticketPrice, "insufficient payment" );
+        require(block.timestamp * 1000 >= lottery.expiresAt, "End time reached");
         require(msg.value >= lottery.ticketPrice, "insufficient payment" );
 
         lottery.participants.push(msg.sender);
@@ -56,8 +55,8 @@ contract Lottery {
     function pickWinner(uint256 _id) public {
         LotteryStruct storage lottery = lotteries[_id];
         uint256 totalLotteryAmount = lottery.ticketPrice * lottery.participants.length;
-        uint index = random(_id) % lottery.participants.length;
-        payable(lottery.participants[index]).transfer(totalLotteryAmount);
+        //uint index = random(_id) % lottery.participants.length;
+        payable(lottery.participants[0]).transfer(totalLotteryAmount);
         lottery.ended = true;
     }
 
@@ -92,6 +91,8 @@ contract Lottery {
     function getLotteryCount() public view returns (uint256) {
      return _totalLotteries;
     }
-
+ function getDate(uint256 _index) public view returns (uint256) {
+     return lotteries[_index].expiresAt;
+    }
 
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getLotteries, enter } from '../utils'
+import { getLotteries, enter, endLottery, expire } from '../utils'
 import LotteryCard from '../components/LotteryCard'
 import LotteryForm from '../components/LotteryForm'
 
@@ -20,26 +20,24 @@ export default function Home(props: HomeProps) : JSX.Element{
 
   const getLotteryHandler = async () => {
     const res = await getLotteries()
-    console.log(res)
     setLotteries(res)
+    console.log((await expire(0)).toNumber())
   }
 
   const enterLotteryHandler = (id, price) => {
     enter(id, price)
   }
 
-  const sendBid = async () => {
-    // setLoading(true)
-    // await bidAuction(selectedItemId, selectedItemValue)
-    // await getLotteryHandler()
-    // setLoading(false)
+  const endLotteryHandler = async id => {
+    const res = await endLottery(id)
+    console.log(res)
   }
 
   useEffect(() => {
 
     getLotteryHandler()
 
-  }, [getLotteries])
+  }, [getLotteries, expire])
 
   return (
     <div className="item-list">
@@ -53,9 +51,12 @@ export default function Home(props: HomeProps) : JSX.Element{
               id={lottery.id}
               owner={lottery.owner}
               title={lottery.title}
-              // endTime={item.endTime}
+              price={lottery.ticketPrice}
+              participants={lottery.participants.length}
+              endTime={lottery.expiresAt}
               ended={lottery.ended}
               enterLotteryHandler={enterLotteryHandler}
+              endLotteryHandler={endLotteryHandler}
             />
           ))}
       </div>
