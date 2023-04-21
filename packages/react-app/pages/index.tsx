@@ -51,7 +51,7 @@ export default function Home(props: HomeProps) : JSX.Element{
               owner={lottery.owner}
               title={lottery.title}
               price={lottery.ticketPrice}
-              participants={lottery.participants.length}
+              participants={lottery.participants.toNumber()}
               endTime={lottery.expiresAt}
               ended={lottery.ended}
               enterLotteryHandler={enterLotteryHandler}

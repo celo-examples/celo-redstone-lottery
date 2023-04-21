@@ -12,6 +12,7 @@ contract Lottery is PriceAwareOwnable {
         string title;
         uint256 ticketPrice;
         uint256[] luckyNumbers;
+        uint256[] selectedLuckyNumbers;
         uint256 participantCount;
         bool ended;
         address owner;
@@ -36,13 +37,22 @@ contract Lottery is PriceAwareOwnable {
 
      function createLottery(string memory title, uint256 ticketPrice, uint256 expiresAt) public {
         require(bytes(title).length > 0, "Title can't be empty");
-        require(ticketPrice > 0 ether, "TicketPrice cannot be zero");
+        require(ticketPrice > 0 ether, "Ticket Price cannot be zero");
         require( expiresAt > block.timestamp, "Expiration date cannot be less than the future" );
+
+        uint256 randomness = random();
+        uint256[] memory _luckyNumbers = new uint256[](10);
+        uint256 maxValue = 1000;
+
+        for (uint i = 0; i < 10; i++) {
+          _luckyNumbers[i] = uint256(keccak256(abi.encode(randomness, i))) % maxValue + 1;
+        }
 
         LotteryStruct memory lottery;
 
         lottery.id = totalLotteries;
         lottery.title = title;
+        lottery.luckyNumbers = _luckyNumbers;
         lottery.ticketPrice = ticketPrice;
         lottery.owner = msg.sender;
         lottery.createdAt = block.timestamp;
@@ -61,15 +71,15 @@ contract Lottery is PriceAwareOwnable {
         require(block.timestamp * 1000 >= lottery.expiresAt, "End time reached");
         require(msg.value >= lottery.ticketPrice, "insufficient payment" );
 
-        uint256 _luckyNumber = random();
-
         lotteryParticipants[_id] = ParticipantStruct({
             account: payable(msg.sender),
-            luckyNumber: _luckyNumber,
+            luckyNumber: 6,
             paid: false
         });
 
-        lottery.luckyNumbers.push(_luckyNumber);
+        lottery.participantCount ++;
+
+        lottery.selectedLuckyNumbers.push(6);
     }
 
     function pickWinner(uint256 _id) public {
@@ -88,7 +98,8 @@ contract Lottery is PriceAwareOwnable {
         uint256 id,
         string memory title,
         uint256 ticketPrice,
-        //ParticipantStruct[] calldata participants,
+        uint256[] memory luckyNumbers,
+        uint256 participants,
         bool ended,
         address owner,
         uint256 createdAt,
@@ -100,7 +111,8 @@ contract Lottery is PriceAwareOwnable {
             _lottery.id,
             _lottery.title,
             _lottery.ticketPrice,
-           // _lottery.participantCount,
+            _lottery.luckyNumbers,
+            _lottery.participantCount,
             _lottery.ended,
             _lottery.owner,
             _lottery.createdAt,
@@ -116,7 +128,7 @@ contract Lottery is PriceAwareOwnable {
               keccak256(
                 abi.encodePacked(
                   randomValue,
-                  block.timestamp,
+                  block.timestamp / 1000,
                   blockhash(block.number - 1),
                   blockhash(block.number)
                 )

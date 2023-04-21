@@ -3,7 +3,7 @@ import { WrapperBuilder } from 'redstone-evm-connector'
 import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
 import { priceToWei } from './helpers'
 
-export const contractAddress = '0xBb915A2421E353A4c2c653B94FfcD2E85a32A09f'
+export const contractAddress = '0x300981a961B1e6b0A50b6343d2B770A3Efb63D57'
 
 export async function getContract() {
 
@@ -26,8 +26,18 @@ export const createLottery = async (title, ticketPrice, endTime) => {
  console.log(priceToWei(ticketPrice))
   try {
     const contract = await getContract()
-      const res = await contract.createLottery(title, priceToWei(ticketPrice), endTime)
-      return await res.wait()
+    const wrappedContract = WrapperBuilder
+      .wrapLite(contract)
+      .usingPriceFeed('redstone', { asset: 'ENTROPY' })
+
+    // Provider should be authorized once after contract deployment
+    // You should be the owner of the contract to authorize provider
+    await wrappedContract.authorizeProvider();
+
+
+    // let res = await wrappedContract.test()
+      const res = await wrappedContract.createLottery(title, priceToWei(ticketPrice), endTime)
+      return res
   } catch (e) {
     console.log(e)
   }
@@ -44,7 +54,7 @@ export const getLotteries = async () => {
       const lottery = await contract.getLottery(i)
       lotteries.push(lottery)
     }
-
+console.log(lotteries)
     return lotteries
 
   } catch (e) {
@@ -83,7 +93,7 @@ export const endLottery = async index => {
     // let res = await wrappedContract.pickWinner(index)
     // res = await res.wait()
     const bigNumber = BigNumber.from(res);
-    const decimalValue = bigNumber.toString(10);
+    const decimalValue = bigNumber.toString();
 
     console.log('rrrr ', decimalValue)
     return res
