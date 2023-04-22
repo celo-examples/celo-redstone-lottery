@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getLotteries, enter, endLottery } from '../utils'
+import { getLotteries, enter, endLottery, getParticipant } from '../utils'
 import LotteryCard from '../components/LotteryCard'
 import LotteryForm from '../components/LotteryForm'
 
@@ -27,6 +27,10 @@ export default function Home(props: HomeProps) : JSX.Element{
     enter(id, price)
   }
 
+  const getParticipantHandler = () => {
+    getParticipant()
+  }
+
   const endLotteryHandler = async id => {
     const res = await endLottery(id)
     console.log(res)
@@ -40,7 +44,7 @@ export default function Home(props: HomeProps) : JSX.Element{
 
   return (
     <div className="item-list">
-      <button type={'button'} onClick={() => endLotteryHandler(0)}>Endlot</button>
+      <button type={'button'} onClick={() => getParticipantHandler()}>Endlot</button>
       <LotteryForm updateList={getLotteryHandler}/>
 
         <div className="grid grid-cols-3 gap-4 mt-10">

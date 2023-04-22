@@ -5,7 +5,7 @@ import "redstone-evm-connector/lib/contracts/message-based/PriceAwareOwnable.sol
 
 contract Lottery is PriceAwareOwnable {
 
-    uint256 private totalLotteries;
+    uint256 private totalLotteries = 0;
 
     struct LotteryStruct {
         uint256 id;
@@ -71,15 +71,33 @@ contract Lottery is PriceAwareOwnable {
         require(block.timestamp * 1000 >= lottery.expiresAt, "End time reached");
         require(msg.value >= lottery.ticketPrice, "insufficient payment" );
 
-        lotteryParticipants[_id] = ParticipantStruct({
-            account: payable(msg.sender),
-            luckyNumber: 6,
-            paid: false
-        });
+        uint256 luckyNumber;
+        uint256[] memory selectedLuckyNumbers = lottery.selectedLuckyNumbers;
+        bool numberAlreadySelected;
+
+        do {
+            // generate a random index within the range of luckyNumbers array
+            uint256 index = uint256(keccak256(abi.encodePacked(block.timestamp))) % lottery.luckyNumbers.length;
+            //uint256 index = 0;
+            luckyNumber = lottery.luckyNumbers[index];
+            // check if the number has already been selected by the current participant
+            numberAlreadySelected = false;
+            for (uint256 i = 0; i < selectedLuckyNumbers.length; i++) {
+                if (selectedLuckyNumbers[i] == luckyNumber) {
+                    numberAlreadySelected = true;
+                    break;
+                }
+            }
+        } while (numberAlreadySelected);
+
+        ParticipantStruct storage participant = lotteryParticipants[_id];
+        participant.account = payable(msg.sender);
+        participant.luckyNumber = luckyNumber;
+        participant.paid = false;
 
         lottery.participantCount ++;
 
-        lottery.selectedLuckyNumbers.push(6);
+        lottery.selectedLuckyNumbers.push(luckyNumber);
     }
 
     function pickWinner(uint256 _id) public {
@@ -119,6 +137,21 @@ contract Lottery is PriceAwareOwnable {
             _lottery.expiresAt
         );
     }
+
+    function getParticipant(uint256 _id) public view returns (
+            address account,
+            uint256 luckyNumber,
+            bool paid
+
+        )  {
+            ParticipantStruct storage _participant = lotteryParticipants[_id];
+
+            return (
+                _participant.account,
+                _participant.luckyNumber,
+                _participant.paid
+            );
+        }
 
     function random() private view returns (uint256) {
 
