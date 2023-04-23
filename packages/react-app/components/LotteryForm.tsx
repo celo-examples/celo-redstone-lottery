@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { toTimestamp, createLottery } from '../utils'
 
-// interface AuctionFormProps {
-//   updateList: DoSomethingFunction;
-// }
-
-export default function LotteryForm(props: AuctionFormProps) : JSX.Element {
+const LotteryForm = () => {
 
   const [loading, setLoading] = useState(false)
   const [title, setTitle] = useState('')
@@ -14,9 +10,9 @@ export default function LotteryForm(props: AuctionFormProps) : JSX.Element {
 
   const createLotteryHandler = async () => {
     setLoading(true)
-    const res = await createLottery(title, ticketPrice, endTime)
-    console.log(res)
-    // window.location.reload()
+    await createLottery(title, ticketPrice, endTime)
+    setLoading(false)
+    window.location.reload()
   }
 
   return (
@@ -46,5 +42,6 @@ export default function LotteryForm(props: AuctionFormProps) : JSX.Element {
       </form>
     </div>
 
-)
-}
+)}
+
+export default LotteryForm

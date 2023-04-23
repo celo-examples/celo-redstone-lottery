@@ -1,9 +1,9 @@
-import { providers, Contract, ethers, BigNumber } from 'ethers'
+import { providers, Contract } from 'ethers'
 import { WrapperBuilder } from 'redstone-evm-connector'
 import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
 import { priceToWei } from './helpers'
 
-export const contractAddress = '0x6C61fA0A60774D991CC17FDD9217c740451e68CA'
+export const contractAddress = '0x79Ef0E191bccE3CbD93110aB999414f0aD013081'
 
 export async function getContract() {
 
@@ -23,7 +23,7 @@ export async function getContract() {
 }
 
 export const createLottery = async (title, ticketPrice, endTime) => {
- console.log(priceToWei(ticketPrice))
+
   try {
     const contract = await getContract()
     const wrappedContract = WrapperBuilder
@@ -32,12 +32,12 @@ export const createLottery = async (title, ticketPrice, endTime) => {
 
     // Provider should be authorized once after contract deployment
     // You should be the owner of the contract to authorize provider
-    await wrappedContract.authorizeProvider();
+    const result = await wrappedContract.authorizeProvider();
 
+    if (result) {
+      return await wrappedContract.createLottery(title, priceToWei(ticketPrice), endTime)
+    }
 
-    // let res = await wrappedContract.test()
-      const res = await wrappedContract.createLottery(title, priceToWei(ticketPrice), endTime)
-      return res
   } catch (e) {
     console.log(e)
   }
@@ -108,17 +108,16 @@ export const endLottery = async index => {
     await wrappedContract.authorizeProvider();
 
 
-    let res = await wrappedContract.test()
-    // let res = await wrappedContract.pickWinner(index)
-    // res = await res.wait()
-    const bigNumber = BigNumber.from(res);
-    const decimalValue = bigNumber.toString();
+    //let res = await wrappedContract.test()
+    let res = await wrappedContract.pickWinner(index)
+    res = await res.wait()
+    // const bigNumber = BigNumber.from(res);
+    // const decimalValue = bigNumber.toString();
 
-    console.log('rrrr ', decimalValue)
+    console.log('rrrr ', res)
     return res
 
   } catch (e) {
-    console.log('kkl')
     console.log(e)
   }
 }

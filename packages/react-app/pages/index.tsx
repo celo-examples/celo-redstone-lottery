@@ -3,28 +3,19 @@ import { getLotteries, enter, endLottery, getParticipant } from '../utils'
 import LotteryCard from '../components/LotteryCard'
 import LotteryForm from '../components/LotteryForm'
 
-type DoSomethingFunction = () => void;
-
-interface HomeProps {
-  updateList: DoSomethingFunction;
-}
-
 
 export default function Home(props: HomeProps) : JSX.Element{
 
-  const [loading, setLoading] = useState(false)
-  const [showForm, setShowForm] = useState(false)
   const [lotteries, setLotteries] = useState(undefined)
-  const [selectedItemId, setSelectedItemId] = useState('')
-  const [selectedItemValue, setSelectedItemValue] = useState('')
 
   const getLotteryHandler = async () => {
     const res = await getLotteries()
     setLotteries(res)
   }
 
-  const enterLotteryHandler = (id, price) => {
-    enter(id, price)
+  const enterLotteryHandler = async (id, price) => {
+    await enter(id, price)
+    getLotteryHandler()
   }
 
   const getParticipantHandler = () => {
@@ -32,8 +23,8 @@ export default function Home(props: HomeProps) : JSX.Element{
   }
 
   const endLotteryHandler = async id => {
-    const res = await endLottery(id)
-    console.log(res)
+    await endLottery(id)
+    getLotteryHandler()
   }
 
   useEffect(() => {
@@ -56,6 +47,7 @@ export default function Home(props: HomeProps) : JSX.Element{
               title={lottery.title}
               price={lottery.ticketPrice}
               participants={lottery.participants.toNumber()}
+              winner={lottery.winner}
               endTime={lottery.expiresAt}
               ended={lottery.ended}
               enterLotteryHandler={enterLotteryHandler}

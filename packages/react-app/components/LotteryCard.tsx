@@ -1,5 +1,5 @@
-import { timestampToDate, lotteryElapsed } from '../utils'
-import {ethers} from "ethers";
+import { ethers } from 'ethers'
+import { timestampToDate, lotteryElapsed, truncate } from '../utils'
 import { useAccount } from 'wagmi'
 
 interface LotteryCardProps {
@@ -8,6 +8,7 @@ interface LotteryCardProps {
   title: string;
   price: number;
   participants: number;
+  winner: address;
   endTime: number;
   ended: boolean;
   enterLotteryHandler: (id: number, price: number) => void;
@@ -22,6 +23,7 @@ const LotteryCard: React.FC<LotteryCardProps> = ({
      title,
      price,
      participants,
+     winner,
      endTime,
      ended,
      enterLotteryHandler,
@@ -50,11 +52,14 @@ const LotteryCard: React.FC<LotteryCardProps> = ({
             Buy
           </button>}
           {!ended && lotteryElapsed(endTime) && <button onClick={() => endLotteryHandler(id)} className="mt-3 bg-slate-300 w-28 rounded">
-            End Lottery
+            End Lottery {ended}
           </button>}
-          {ended && <button disabled className="mt-3 bg-slate-200 w-28 rounded">
+          {ended && <div><button disabled className="mt-3 bg-slate-200 w-28 rounded">
             Lottery Ended
-          </button>}
+          </button>
+          <br/>
+          <small>Winner: {truncate(winner)}</small>
+          </div>}
         </div>
       </div>
   );
