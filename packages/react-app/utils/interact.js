@@ -95,27 +95,19 @@ export const enter = async (index, value) => {
 }
 
 export const endLottery = async index => {
+
   try {
     const contract = await getContract()
-
 
     const wrappedContract = WrapperBuilder
       .wrapLite(contract)
       .usingPriceFeed('redstone', { asset: 'ENTROPY' })
 
-    // Provider should be authorized once after contract deployment
-    // You should be the owner of the contract to authorize provider
     await wrappedContract.authorizeProvider();
 
-
-    //let res = await wrappedContract.test()
     let res = await wrappedContract.pickWinner(index)
-    res = await res.wait()
-    // const bigNumber = BigNumber.from(res);
-    // const decimalValue = bigNumber.toString();
+    return await res.wait()
 
-    console.log('rrrr ', res)
-    return res
 
   } catch (e) {
     console.log(e)

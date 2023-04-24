@@ -4,7 +4,7 @@ import LotteryCard from '../components/LotteryCard'
 import LotteryForm from '../components/LotteryForm'
 
 
-export default function Home(props: HomeProps) : JSX.Element{
+const Home = () => {
 
   const [lotteries, setLotteries] = useState(undefined)
 
@@ -35,7 +35,6 @@ export default function Home(props: HomeProps) : JSX.Element{
 
   return (
     <div className="item-list">
-      <button type={'button'} onClick={() => getParticipantHandler()}>Endlot</button>
       <LotteryForm updateList={getLotteryHandler}/>
 
         <div className="grid grid-cols-3 gap-4 mt-10">
@@ -58,4 +57,6 @@ export default function Home(props: HomeProps) : JSX.Element{
     </div>
   )
 }
+
+export default Home
 

@@ -31,26 +31,18 @@ contract Lottery is PriceAwareOwnable {
 
     event Random(uint256 rand);
 
-    function createLottery(
-        string memory title,
-        uint256 ticketPrice,
-        uint256 expiresAt
-    ) public {
+    function createLottery( string memory title, uint256 ticketPrice, uint256 expiresAt ) public {
+
         require(bytes(title).length > 0, "Title can't be empty");
         require(ticketPrice > 0 ether, "Ticket Price cannot be zero");
-        require(
-            expiresAt > block.timestamp,
-            "Expiration date cannot be less than the future"
-        );
+        require( expiresAt > block.timestamp, "Expiration date cannot be less than the future" );
 
         uint256 randomness = random();
         uint256[] memory _luckyNumbers = new uint256[](10);
         uint256 maxValue = 1000;
 
         for (uint256 i = 0; i < 10; i++) {
-            _luckyNumbers[i] =
-                (uint256(keccak256(abi.encode(randomness, i))) % maxValue) +
-                1;
+            _luckyNumbers[i] = (uint256(keccak256(abi.encode(randomness, i))) % maxValue) + 1;
         }
 
         LotteryStruct memory lottery;
@@ -72,10 +64,7 @@ contract Lottery is PriceAwareOwnable {
         LotteryStruct storage lottery = lotteries[_id];
 
         require(msg.sender != lottery.owner, "Owner can't participate");
-        require(
-            block.timestamp * 1000 >= lottery.expiresAt,
-            "End time reached"
-        );
+        require(block.timestamp * 1000 >= lottery.expiresAt, "End time reached");
         require(msg.value >= lottery.ticketPrice, "insufficient payment");
 
         uint256 luckyNumber;
@@ -84,10 +73,8 @@ contract Lottery is PriceAwareOwnable {
 
         do {
             // generate a random index within the range of luckyNumbers array
-            uint256 index = uint256(
-                keccak256(abi.encodePacked(block.timestamp))
-            ) % lottery.luckyNumbers.length;
-            //uint256 index = 0;
+            uint256 index = uint256( keccak256(abi.encodePacked(block.timestamp))) % lottery.luckyNumbers.length;
+
             luckyNumber = lottery.luckyNumbers[index];
             // check if the number has already been selected by the current participant
             numberAlreadySelected = false;
@@ -111,12 +98,9 @@ contract Lottery is PriceAwareOwnable {
 
     function pickWinner(uint256 _id) public {
         LotteryStruct storage lottery = lotteries[_id];
-        uint256 totalLotteryAmount = lottery.ticketPrice *
-            lottery.participantCount;
+        uint256 totalLotteryAmount = lottery.ticketPrice * lottery.participantCount;
 
-        uint256 winnerNumberIndex = uint256(
-            keccak256(abi.encodePacked(block.timestamp))
-        ) % lottery.selectedLuckyNumbers.length;
+        uint256 winnerNumberIndex = uint256( keccak256(abi.encodePacked(block.timestamp)) ) % lottery.selectedLuckyNumbers.length;
 
         lotteryParticipants[_id].account.transfer(totalLotteryAmount);
         lottery.winner = lotteryParticipants[_id].account;
@@ -124,10 +108,7 @@ contract Lottery is PriceAwareOwnable {
         emit Random(winnerNumberIndex);
     }
 
-    function getLottery(uint256 _id)
-        public
-        view
-        returns (
+    function getLottery(uint256 _id) public view returns (
             uint256 id,
             string memory title,
             uint256 ticketPrice,
@@ -156,15 +137,8 @@ contract Lottery is PriceAwareOwnable {
         );
     }
 
-    function getParticipant(uint256 _id)
-        public
-        view
-        returns (
-            address account,
-            uint256 luckyNumber,
-            bool paid
-        )
-    {
+    function getParticipant(uint256 _id) public view returns (address account, uint256 luckyNumber, bool paid) {
+
         ParticipantStruct storage _participant = lotteryParticipants[_id];
 
         return (
