@@ -8,7 +8,7 @@ interface LotteryCardProps {
   title: string;
   price: number;
   participants: number;
-  winner: address;
+  winner: string;
   endTime: number;
   ended: boolean;
   enterLotteryHandler: (id: number, price: number) => void;
