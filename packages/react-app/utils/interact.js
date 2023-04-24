@@ -1,6 +1,7 @@
 import { providers, Contract } from 'ethers'
 import { WrapperBuilder } from 'redstone-evm-connector'
-import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
+import Lottery from '../Lottery.json'
+// import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
 import { priceToWei } from './helpers'
 
 export const contractAddress = '0x79Ef0E191bccE3CbD93110aB999414f0aD013081'
