@@ -5,8 +5,8 @@ const LotteryForm = () => {
 
   const [loading, setLoading] = useState(false)
   const [title, setTitle] = useState('')
-  const [ticketPrice, setTicketPrice] = useState('')
-  const [endTime, setEndTime] = useState('')
+  const [ticketPrice, setTicketPrice] = useState(undefined)
+  const [endTime, setEndTime] = useState(undefined)
 
   const createLotteryHandler = async () => {
     setLoading(true)
