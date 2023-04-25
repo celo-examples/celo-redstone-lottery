@@ -1,7 +1,6 @@
 import { providers, Contract } from 'ethers'
 import { WrapperBuilder } from 'redstone-evm-connector'
 import Lottery from '../Lottery.json'
-// import Lottery from '../../hardhat/artifacts/contracts/Lottery.sol/Lottery.json'
 import { priceToWei } from './helpers'
 
 export const contractAddress = '0x79Ef0E191bccE3CbD93110aB999414f0aD013081'
@@ -55,7 +54,6 @@ export const getLotteries = async () => {
       const lottery = await contract.getLottery(i)
       lotteries.push(lottery)
     }
-console.log(lotteries)
     return lotteries
 
   } catch (e) {
@@ -74,7 +72,6 @@ export const getParticipant = async () => {
       const lottery = await contract.getParticipant(i)
       lotteries.push(lottery)
     }
-    console.log(lotteries)
     return lotteries
 
   } catch (e) {
