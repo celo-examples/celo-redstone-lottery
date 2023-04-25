@@ -27,7 +27,7 @@ const LotteryForm = () => {
         </div>
         <div className="flex items-center space-x-2">
           <label htmlFor="item-price" className="sr-only">Ticket Price</label>
-          <input onChange={e => setTicketPrice((e.target.value).toNumber())} type="number" name="item-price" id="item-price" placeholder="Item Price"
+          <input onChange={e => setTicketPrice(e.target.value)} type="number" name="item-price" id="item-price" placeholder="Item Price"
                  className="w-24 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
         </div>
         <div className="flex items-center space-x-2">
